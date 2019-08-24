@@ -9,6 +9,9 @@ import Foodsystem_Admin.Admin_Login;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -80,12 +83,10 @@ public class Admin_Registration extends javax.swing.JFrame {
         jLabel3.setText("Username:*");
 
         jLabel4.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
-        jLabel4.setText("Set Password:*");
+        jLabel4.setText(" Password:*");
 
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         jLabel5.setText("Email:*");
-
-        jLabel6.setIcon(new javax.swing.ImageIcon("/Users/A/Desktop/FoodSystem_Lapizzeria/src/foodsystem_lapizzeria/Screen Shot 2018-12-09 at 16.25.53.png")); // NOI18N
 
         jToggleButton3.setText("Cancel");
         jToggleButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -135,7 +136,7 @@ public class Admin_Registration extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(21, 21, 21)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel1)
@@ -184,16 +185,18 @@ public class Admin_Registration extends javax.swing.JFrame {
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         // TODO add your handling code here:Admin
-        if (txname.getText().trim().isEmpty()){
-            JOptionPane.showMessageDialog(null, "Field is Empty");
+        String name = txname.getText();
+        String uname= tfusername.getText();
+        
+        if (txname.getText().trim().isEmpty() || tfusername.getText().trim().isEmpty() ||txpass.getText().trim().isEmpty() ) {
+            JOptionPane.showMessageDialog(null, "Field is Empty","Empty Fields",2);
         }else
-         if(tfusername.getText().trim().isEmpty()) {
-             JOptionPane.showMessageDialog(null, "Field is Empty");
-         }else
-          if(txpass.getText().trim().isEmpty()){
-             JOptionPane.showMessageDialog(null, "Field is Empty");
-      
-    }else {
+          
+//              Admin_Registration user = null;
+//              if (name.equals(user) && uname.equals(user)){
+//                JOptionPane.showMessageDialog(null, "User Exists");
+//              }else
+                
         try{
             String qry="Insert into Admin_Registration (name,username,password,email) values(?,?,?,?)";
             pst=conn.prepareStatement(qry);
@@ -207,7 +210,7 @@ public class Admin_Registration extends javax.swing.JFrame {
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, "sm"+e);
             dispose();
-        }
+        
     }//GEN-LAST:event_jToggleButton1ActionPerformed
     }
     private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
