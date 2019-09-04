@@ -1,6 +1,5 @@
 package Foodsystem_Admin;
 
-
 import Foodsystem_Admin.AdminPage;
 import Foodsystem_Admin.ProConnection;
 import java.awt.HeadlessException;
@@ -36,14 +35,14 @@ public class AdminPage extends javax.swing.JFrame {
         ItemTable();
         MainMenuTable();
         ResTable();
-     //   AcceptReject();
+        //   AcceptReject();
     }
-    
-    public AdminPage(ListModel modl){
+
+    public AdminPage(ListModel modl) {
         initComponents();
         jListAdmin.setModel(modl);
     }
-    
+
 //    public void AcceptReject() {
 //     //   if (jButton3.isEnabled()) {
 //        // setVisible(true);
@@ -72,26 +71,25 @@ public class AdminPage extends javax.swing.JFrame {
 //     //   }
 //        
 //    }
-    
     public void MainMenuTable() {
         try {
             String qry = " select * from submenu group by sub_id";
             pst = conn.prepareStatement(qry);
             res = pst.executeQuery();
             menu_tbl.setModel(DbUtils.resultSetToTableModel(res));
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    
+
     public void ItemTable() {
         try {
-            String qry = " select * from itemmenu order by item_title";
+            String qry = "select * from itemmenu order by item_title";
             pst = conn.prepareStatement(qry);
             res = pst.executeQuery();
             item_tbl.setModel(DbUtils.resultSetToTableModel(res));
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
@@ -103,12 +101,12 @@ public class AdminPage extends javax.swing.JFrame {
             pst = conn.prepareStatement(qry);
             res = pst.executeQuery();
             Res_tbl.setModel(DbUtils.resultSetToTableModel(res));
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -254,6 +252,8 @@ public class AdminPage extends javax.swing.JFrame {
 
         jTextField10.setEditable(false);
 
+        jScrollPane3.setEnabled(false);
+
         Res_tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -326,9 +326,9 @@ public class AdminPage extends javax.swing.JFrame {
                             .addComponent(jTextField10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextField9, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 563, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(16, 16, 16))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 541, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(38, 38, 38))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -387,6 +387,7 @@ public class AdminPage extends javax.swing.JFrame {
 
             }
         ));
+        item_tbl.setEnabled(false);
         item_tbl.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 item_tblMouseClicked(evt);
@@ -431,6 +432,7 @@ public class AdminPage extends javax.swing.JFrame {
 
             }
         ));
+        menu_tbl.setEnabled(false);
         menu_tbl.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 menu_tblMouseClicked(evt);
@@ -666,11 +668,11 @@ public class AdminPage extends javax.swing.JFrame {
             pst.setString(1, jTextField7.getText());
             pst.execute();
             MainMenuTable();
-            
+
             JOptionPane.showMessageDialog(null, "Menu Item Saved Successfuylly !");
-            
+
         } catch (Exception e) {
-            
+
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -683,11 +685,11 @@ public class AdminPage extends javax.swing.JFrame {
             //  pst.setString(2, jTextField7.getText());
             pst.executeUpdate();
             MainMenuTable();
-            
+
             JOptionPane.showMessageDialog(null, "Menu Item Deleted Successfuylly !");
-            
+
         } catch (Exception e) {
-            
+
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -712,7 +714,7 @@ public class AdminPage extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(AdminPage.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void item_tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_item_tblMouseClicked
@@ -773,7 +775,7 @@ public class AdminPage extends javax.swing.JFrame {
         String value4 = jTextField4.getText();
         String value5 = jTextField5.getText();
         String value6 = jTextField6.getText();
-        
+
         try {
             String qry = "Update itemmenu set description='" + value2 + "',sub_id='" + value3 + "',"
                     + "price='" + value4 + "', size='" + value5 + "', item_title='" + value6 + "'where item_id='" + value1 + "'";
@@ -782,7 +784,7 @@ public class AdminPage extends javax.swing.JFrame {
             ItemTable();
             JOptionPane.showMessageDialog(null, "Item Successfuylly Updated !");
         } catch (Exception e) {
-            
+
         }
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -799,7 +801,7 @@ public class AdminPage extends javax.swing.JFrame {
         jTextArea2.setText(model.getValueAt(row, 2).toString());
         jTextField12.setText(model.getValueAt(row, 3).toString());
         jTextArea1.setText(model.getValueAt(row, 4).toString());
-        
+
 
     }//GEN-LAST:event_Res_tblMouseClicked
 

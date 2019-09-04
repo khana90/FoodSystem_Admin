@@ -188,7 +188,7 @@ public class Admin_Registration extends javax.swing.JFrame {
         String name = txname.getText();
         String uname= tfusername.getText();
         
-        if (txname.getText().trim().isEmpty() || tfusername.getText().trim().isEmpty() ||txpass.getText().trim().isEmpty() ) {
+  if (txname.getText().trim().isEmpty() || tfusername.getText().trim().isEmpty() ||txpass.getText().trim().isEmpty()||txemail.getText().trim().isEmpty() ) {
             JOptionPane.showMessageDialog(null, "Field is Empty","Empty Fields",2);
         }else
           

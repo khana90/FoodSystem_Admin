@@ -241,9 +241,9 @@
                                       <Component id="jTextField9" alignment="0" max="32767" attributes="0"/>
                                       <Component id="jLabel12" alignment="0" max="32767" attributes="0"/>
                                   </Group>
-                                  <EmptySpace pref="100" max="32767" attributes="0"/>
-                                  <Component id="jScrollPane3" min="-2" pref="563" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                                  <EmptySpace pref="53" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane3" min="-2" pref="541" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -356,6 +356,9 @@
                 <Component class="javax.swing.JTextField" name="jTextField12">
                 </Component>
                 <Container class="javax.swing.JScrollPane" name="jScrollPane3">
+                  <Properties>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
                   <AuxValues>
                     <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                   </AuxValues>
@@ -660,6 +663,7 @@
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                           <TableColumnModel selectionModel="0"/>
                         </Property>
+                        <Property name="enabled" type="boolean" value="false"/>
                         <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
                           <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                         </Property>
@@ -759,6 +763,7 @@
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                           <TableColumnModel selectionModel="0"/>
                         </Property>
+                        <Property name="enabled" type="boolean" value="false"/>
                         <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
                           <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                         </Property>
