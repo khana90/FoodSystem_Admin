@@ -387,7 +387,6 @@ public class AdminPage extends javax.swing.JFrame {
 
             }
         ));
-        item_tbl.setEnabled(false);
         item_tbl.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 item_tblMouseClicked(evt);
@@ -432,7 +431,6 @@ public class AdminPage extends javax.swing.JFrame {
 
             }
         ));
-        menu_tbl.setEnabled(false);
         menu_tbl.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 menu_tblMouseClicked(evt);
