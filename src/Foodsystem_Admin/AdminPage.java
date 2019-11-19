@@ -10,11 +10,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
+import foodsystem_lapizzeria.Login;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *
@@ -25,17 +29,19 @@ public class AdminPage extends javax.swing.JFrame {
     Connection conn;
     ResultSet res;
     PreparedStatement pst;
+    String qry;
 
-    /**
-     * Creates new form AdminPage
-     */
+    public static int CustomerId;
+
     public AdminPage() {
         initComponents();
         conn = ProConnection.ConnectDB();
         ItemTable();
         MainMenuTable();
         ResTable();
-        //   AcceptReject();
+        LiveOrders();
+        this.setLocationRelativeTo(null);
+
     }
 
     public AdminPage(ListModel modl) {
@@ -43,34 +49,70 @@ public class AdminPage extends javax.swing.JFrame {
         jListAdmin.setModel(modl);
     }
 
-//    public void AcceptReject() {
-//     //   if (jButton3.isEnabled()) {
-//        // setVisible(true);
-//        int YesOrNo = JOptionPane.showConfirmDialog(null, "Accept Order !", "Receive New Order", JOptionPane.YES_NO_OPTION);
-//        if(YesOrNo==0){
-//            
-//          //  ResReceipt res = new ResReceipt();
-////            ResReceipt.jList1.setModel(ResReceipt.jList1.getModel());
-////
-////            ResReceipt.jTextArea1.setText(AdminPage.jTextArea3.getText());
-//           // res.setVisible(false);
-//        } else {
-//            jPanel4.enable(false);
-//           JOptionPane.showConfirmDialog(null, "adsdfd", "order", JOptionPane.ABORT);
-//           
-//             
-//        }if(YesOrNo==0){
-//            JOptionPane.showMessageDialog(null, "order is accepted");
-//           // new ResReceipt().setVisible(true);
-//        }else if(YesOrNo>0){
-//            JOptionPane.showMessageDialog(null, "order is rejected");
-//           // JOptionPane.showConfirmDialog(null, "order is rejected", "order", JOptionPane.ABORT);
-//            
-//           // new ResReceipt().setVisible(true);
-//        }
-//     //   }
-//        
-//    }
+    public void LiveOrders() {
+        java.util.TimerTask task = new java.util.TimerTask() {
+            int prevCount = 0;
+
+            @Override
+            public void run() {
+                try {
+
+                    DefaultListModel model = new DefaultListModel();
+                    String qry = "SELECT * from receipt where cust_id = (select Max(cust_id) from Receipt) and DateTime = (select MAX(DateTime) from payment)  \n"
+                            + "              GROUP by item_title\n"
+                            + "              ORDER by cust_id";
+
+                    pst = conn.prepareStatement(qry);
+      //   pst.setInt(1, CustomerId);  
+                    //   pst.setInt(2, Shopping_Basket.BasketId);
+                    res = pst.executeQuery();
+
+                    if (res.next()) {
+                        model.addElement("<<<<<<<<<<<CUSTOMER Address>>>>>>>>>>>");
+                        //   model.addElement("Order Status:" + res.getString("order_request"));
+                        model.addElement("Customer Id: " + res.getInt("cust_id"));
+                        model.addElement("Customer Name: " + res.getString("cust_name"));
+                        model.addElement("Customer Email: " + res.getString("cust_email"));
+                        model.addElement("Customer Address: " + res.getString("cust_address"));
+                        model.addElement("Customer Contact: " + res.getString("cust_contact"));
+                        model.addElement("<<<<<<<<<<<PAYMENT OPTION>>>>>>>>>>>");
+                        //  model.addElement("Payment Id: " + res.getInt("paymentId"));
+                        model.addElement("Payment Type: " + res.getString("payment_type"));
+                        model.addElement("Date and Time: " + res.getString("DateTime"));
+                        model.addElement("Sub Total: " + res.getString("total"));
+                    }
+                    jListAdmin.setModel(model);
+
+                    while (res.next()) {
+                        model.addElement("*************CUSTOMER ORDER*************");
+                        model.addElement("Item Name: " + res.getString("item_title"));
+                        model.addElement("Item description: " + res.getString("item_desc"));
+                        model.addElement("Item Price: " + res.getString("item_price"));
+                        model.addElement("Item Size: " + res.getString("item_size"));
+
+                    }
+                    model.addElement("**********Enjoy Your Meal **********");
+                    jListAdmin.setModel(model);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "error with list fetchData" + e);
+                    System.out.println(e.getMessage());
+                }
+            }
+        };
+
+        java.util.Timer timer = new java.util.Timer(true);// true to run timer as daemon thread
+        timer.schedule(task, 0, 5000);// Run task every 5 second
+        try {
+            Thread.sleep(20000); // Cancel task after 1 minute.
+        } catch (InterruptedException e) {
+        }
+      //  timer.cancel();
+
+         
+    } //end of life order class
+
+    
+    //this is the main menu table which retrieve data for the main menu
     public void MainMenuTable() {
         try {
             String qry = " select * from submenu group by sub_id";
@@ -195,33 +237,31 @@ public class AdminPage extends javax.swing.JFrame {
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(377, 377, 377)
-                .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(351, Short.MAX_VALUE))
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(48, 48, 48)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(34, 34, 34)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(53, 53, 53))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(182, 182, 182))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30))))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(jLabel18)
+                .addGap(64, 64, 64)
+                .addComponent(jLabel19)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(64, 64, 64)
-                        .addComponent(jLabel19)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(319, Short.MAX_VALUE))
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 489, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(139, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Live Orders", jPanel4);

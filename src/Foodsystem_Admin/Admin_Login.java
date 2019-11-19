@@ -27,6 +27,7 @@ public class Admin_Login extends javax.swing.JFrame {
     public Admin_Login() {
         initComponents();
         conn=ProConnection.ConnectDB();
+          this.setLocationRelativeTo(null);
     }
 
   
@@ -199,6 +200,7 @@ public class Admin_Login extends javax.swing.JFrame {
         }catch(Exception e){
             
         }
+        this.dispose();
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
