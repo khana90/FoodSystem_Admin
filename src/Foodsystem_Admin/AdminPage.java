@@ -1,13 +1,20 @@
 package Foodsystem_Admin;
 
+import org.jfree.data.jdbc.JDBCCategoryDataset;
+import org.jfree.chart.JFreeChart;
 import Foodsystem_Admin.AdminPage;
 import Foodsystem_Admin.ProConnection;
+import com.sun.jmx.snmp.tasks.Task;
 import java.awt.HeadlessException;
 import java.awt.List;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -16,9 +23,16 @@ import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
-import foodsystem_lapizzeria.Login;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.JFormattedTextField;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+//import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  *
@@ -40,7 +54,28 @@ public class AdminPage extends javax.swing.JFrame {
         MainMenuTable();
         ResTable();
         LiveOrders();
+        //  Sale();
+        DateTime();
+        TotalSale();
+
         this.setLocationRelativeTo(null);
+
+    }
+
+    public void DateTime() {
+        float minutes = 100.5f; // 1:40:30
+        Calendar now = Calendar.getInstance();
+        int day = now.get(Calendar.DAY_OF_MONTH);
+        int month = now.get(Calendar.MONTH);
+        int year = now.get(Calendar.YEAR);
+        jTextField13.setText(day + "/" + (month + 1) + "/" + year);
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        //Time
+        int hour = now.get(Calendar.HOUR_OF_DAY);
+        int minute = now.get(Calendar.MINUTE);
+        int seconds = now.get(Calendar.SECOND);
+        jTextField14.setText(hour + ":" + (minute + 1));
 
     }
 
@@ -51,25 +86,24 @@ public class AdminPage extends javax.swing.JFrame {
 
     public void LiveOrders() {
         java.util.TimerTask task = new java.util.TimerTask() {
-            int prevCount = 0;
-
+            //int cust_id = 0;
             @Override
             public void run() {
-                try {
 
+                try {
                     DefaultListModel model = new DefaultListModel();
-                    String qry = "SELECT * from receipt where cust_id = (select Max(cust_id) from Receipt) and DateTime = (select MAX(DateTime) from payment)  \n"
-                            + "              GROUP by item_title\n"
-                            + "              ORDER by cust_id";
+                    String qry = "SELECT * from receipt where cust_id =(select Max(cust_id) from receipt)  \n"
+                            + "GROUP by item_title\n"
+                            + "ORDER BY cust_id";
 
                     pst = conn.prepareStatement(qry);
-      //   pst.setInt(1, CustomerId);  
+                //    pst.setInt(1, CustomerId);
                     //   pst.setInt(2, Shopping_Basket.BasketId);
                     res = pst.executeQuery();
 
                     if (res.next()) {
                         model.addElement("<<<<<<<<<<<CUSTOMER Address>>>>>>>>>>>");
-                        //   model.addElement("Order Status:" + res.getString("order_request"));
+                          
                         model.addElement("Customer Id: " + res.getInt("cust_id"));
                         model.addElement("Customer Name: " + res.getString("cust_name"));
                         model.addElement("Customer Email: " + res.getString("cust_email"));
@@ -79,7 +113,8 @@ public class AdminPage extends javax.swing.JFrame {
                         //  model.addElement("Payment Id: " + res.getInt("paymentId"));
                         model.addElement("Payment Type: " + res.getString("payment_type"));
                         model.addElement("Date and Time: " + res.getString("DateTime"));
-                        model.addElement("Sub Total: " + res.getString("total"));
+                        model.addElement("Total: " + res.getString("total"));
+                        model.addElement("Note :"+ res.getString("Order_Request"));
                     }
                     jListAdmin.setModel(model);
 
@@ -89,29 +124,27 @@ public class AdminPage extends javax.swing.JFrame {
                         model.addElement("Item description: " + res.getString("item_desc"));
                         model.addElement("Item Price: " + res.getString("item_price"));
                         model.addElement("Item Size: " + res.getString("item_size"));
-
                     }
                     model.addElement("**********Enjoy Your Meal **********");
                     jListAdmin.setModel(model);
+
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "error with list fetchData" + e);
                     System.out.println(e.getMessage());
                 }
+
             }
         };
-
         java.util.Timer timer = new java.util.Timer(true);// true to run timer as daemon thread
-        timer.schedule(task, 0, 5000);// Run task every 5 second
-        try {
-            Thread.sleep(20000); // Cancel task after 1 minute.
-        } catch (InterruptedException e) {
-        }
-      //  timer.cancel();
+        timer.schedule(task, 0, 9000);// Run task every 5 second    
+//        try {
+//            Thread.sleep(20000); // Cancel task after 1 minute.
+//        } catch (InterruptedException e) {
+//        }
+        // timer.cancel();
+    }
 
-         
-    } //end of life order class
-
-    
+    //end of life order class
     //this is the main menu table which retrieve data for the main menu
     public void MainMenuTable() {
         try {
@@ -210,14 +243,32 @@ public class AdminPage extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jTextField11 = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        Sale_Table = new javax.swing.JTable();
+        jLabel25 = new javax.swing.JLabel();
+        jTextField15 = new javax.swing.JTextField();
+        jPanel5 = new javax.swing.JPanel();
+        jToggleButton1 = new javax.swing.JToggleButton();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jTextArea4 = new javax.swing.JTextArea();
+        jLabel21 = new javax.swing.JLabel();
+        jTextField13 = new javax.swing.JTextField();
+        jTextField14 = new javax.swing.JTextField();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
 
-        jTabbedPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 255)));
+        jTabbedPane1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 1, 14), new java.awt.Color(255, 51, 51))); // NOI18N
 
         jPanel4.setBackground(new java.awt.Color(255, 204, 204));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Live Orders", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 1, 18), new java.awt.Color(102, 102, 255))); // NOI18N
 
         jLabel18.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
         jLabel18.setText("Live Orders");
@@ -241,7 +292,7 @@ public class AdminPage extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -261,12 +312,13 @@ public class AdminPage extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 489, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(139, Short.MAX_VALUE))
+                .addContainerGap(302, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Live Orders", jPanel4);
 
         jPanel3.setBackground(new java.awt.Color(153, 255, 153));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Resturant ", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 1, 14), new java.awt.Color(255, 0, 204))); // NOI18N
 
         jLabel12.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         jLabel12.setText("Restaurant Id:");
@@ -366,7 +418,7 @@ public class AdminPage extends javax.swing.JFrame {
                             .addComponent(jTextField10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextField9, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 541, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(38, 38, 38))))
         );
@@ -408,15 +460,16 @@ public class AdminPage extends javax.swing.JFrame {
                 .addComponent(jLabel16)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(212, Short.MAX_VALUE))
+                .addContainerGap(380, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Restuarant Details", jPanel3);
 
         jPanel1.setBackground(new java.awt.Color(153, 255, 204));
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Restuarant Menu ", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 1, 18), new java.awt.Color(255, 0, 51))); // NOI18N
 
-        jLabel1.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lucida Grande", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(102, 102, 255));
         jLabel1.setText("Admin Page");
 
         item_tbl.setModel(new javax.swing.table.DefaultTableModel(
@@ -584,14 +637,17 @@ public class AdminPage extends javax.swing.JFrame {
                             .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
                             .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(333, 333, 333)
-                        .addComponent(jLabel9))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(359, 359, 359)
-                        .addComponent(jLabel8))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(322, 322, 322)
-                        .addComponent(jLabel1)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(333, 333, 333)
+                                .addComponent(jLabel9))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(359, 359, 359)
+                                .addComponent(jLabel8))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(322, 322, 322)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(79, 79, 79))
         );
         jPanel1Layout.setVerticalGroup(
@@ -665,6 +721,146 @@ public class AdminPage extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Menu", jPanel1);
 
+        jPanel6.setBackground(new java.awt.Color(204, 255, 204));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Weekly Sales", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 1, 14), new java.awt.Color(255, 51, 51))); // NOI18N
+
+        jLabel20.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
+        jLabel20.setText("Sales from the last 7 days ");
+
+        jLabel23.setText("Total Weekly Sale");
+
+        Sale_Table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2"
+            }
+        ));
+        jScrollPane9.setViewportView(Sale_Table);
+
+        jLabel25.setText("Total Number of orders");
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(107, 107, 107)
+                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel6Layout.createSequentialGroup()
+                                    .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)))))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(76, 76, 76)
+                        .addComponent(jLabel25)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(273, Short.MAX_VALUE))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(55, 55, 55)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel23)
+                    .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(21, 21, 21)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(61, 61, 61)
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(547, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Sales", jPanel6);
+
+        jPanel5.setBackground(new java.awt.Color(153, 153, 255));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Accounts Section"));
+
+        jToggleButton1.setText("Line Chart");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
+
+        jTextArea4.setColumns(20);
+        jTextArea4.setRows(5);
+        jTextArea4.setText("Financial accounting (or financial accountancy) module in ERP is the field of accounting which is \nconcerned with the summary, analysis and reporting of financial transactions related to Lapizzeria.\nThis involves the preparation of financial statements available for public use. \n\nStockholders, suppliers, banks, employees, government agencies, business owners, and other stakeholders are examples \nof people interested in receiving such information for decision making purposes.\n\nFor simplicity, I have presented the data in a line chart which you can view by pressing the following button");
+        jScrollPane8.setViewportView(jTextArea4);
+
+        jLabel21.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(102, 255, 102));
+        jLabel21.setText("The account module of Lapizzeria ERP");
+
+        jTextField13.setEditable(false);
+
+        jTextField14.setEditable(false);
+
+        jLabel22.setText("Date:");
+
+        jLabel24.setText("Time:");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(jToggleButton1))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 739, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(221, 221, 221)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(53, 53, 53)
+                                .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(89, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jLabel21)
+                .addGap(21, 21, 21)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel22)
+                    .addComponent(jLabel24))
+                .addGap(45, 45, 45)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(75, 75, 75)
+                .addComponent(jToggleButton1)
+                .addContainerGap(538, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Accounts", jPanel5);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -674,7 +870,7 @@ public class AdminPage extends javax.swing.JFrame {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGap(0, 12, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -684,7 +880,7 @@ public class AdminPage extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 34, Short.MAX_VALUE))
+                .addGap(0, 8, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -696,98 +892,6 @@ public class AdminPage extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        try {
-            String qry = "insert into submenu (menu_category) values(?)";
-            pst = conn.prepareStatement(qry);
-            // pst.setInt(1, (Integer.parseInt(jTextField8.getText())));
-            pst.setString(1, jTextField7.getText());
-            pst.execute();
-            MainMenuTable();
-
-            JOptionPane.showMessageDialog(null, "Menu Item Saved Successfuylly !");
-
-        } catch (Exception e) {
-
-        }
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-        try {
-            String qry = "delete from submenu where sub_id=?";
-            pst = conn.prepareStatement(qry);
-            pst.setInt(1, (Integer.parseInt(jTextField8.getText())));
-            //  pst.setString(2, jTextField7.getText());
-            pst.executeUpdate();
-            MainMenuTable();
-
-            JOptionPane.showMessageDialog(null, "Menu Item Deleted Successfuylly !");
-
-        } catch (Exception e) {
-
-        }
-    }//GEN-LAST:event_jButton4ActionPerformed
-
-    private void menu_tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menu_tblMouseClicked
-        // TODO add your handling code here:
-        int i = menu_tbl.getSelectedRow();
-        TableModel model = menu_tbl.getModel();
-        jTextField8.setText(model.getValueAt(i, 0).toString());
-        jTextField7.setText(model.getValueAt(i, 1).toString());
-    }//GEN-LAST:event_menu_tblMouseClicked
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-        String id = jTextField8.getText();
-        String category = jTextField7.getText();
-        String qry = "update submenu set menu_category='" + category + "' where sub_id='" + id + "'";
-        try {
-            pst = conn.prepareStatement(qry);
-            pst.executeUpdate();
-            MainMenuTable();
-            JOptionPane.showMessageDialog(null, "Item Updated !");
-        } catch (SQLException ex) {
-            Logger.getLogger(AdminPage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void item_tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_item_tblMouseClicked
-        // TODO add your handling code here:
-        int i = item_tbl.getSelectedRow();
-        TableModel model = item_tbl.getModel();
-        jTextField1.setText(model.getValueAt(i, 0).toString());
-        jTextField2.setText(model.getValueAt(i, 1).toString());
-        jTextField3.setText(model.getValueAt(i, 2).toString());
-        jTextField4.setText(model.getValueAt(i, 3).toString());
-        jTextField5.setText(model.getValueAt(i, 4).toString());
-        jTextField6.setText(model.getValueAt(i, 5).toString());
-    }//GEN-LAST:event_item_tblMouseClicked
-
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here: Save
-        try {
-            String qry = " insert into itemmenu(description,sub_id,price,size,item_title) values(?,?,?,?,?)";
-            pst = conn.prepareStatement(qry);
-            pst.setString(1, jTextField2.getText());
-            pst.setInt(2, Integer.parseInt(jTextField3.getText()));
-            pst.setDouble(3, Double.parseDouble(jTextField4.getText()));
-            pst.setString(4, jTextField5.getText());
-            pst.setString(5, jTextField6.getText());
-            pst.execute();
-            ItemTable();
-            JOptionPane.showMessageDialog(null, "Item has been saved !");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "wrog enty " + e);
-        }
-    }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // TODO add your handling code here: delete row
@@ -826,22 +930,96 @@ public class AdminPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton6ActionPerformed
 
-    private void jTextField9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField9ActionPerformed
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here: Save
+        try {
+            String qry = " insert into itemmenu(description,sub_id,price,size,item_title) values(?,?,?,?,?)";
+            pst = conn.prepareStatement(qry);
+            pst.setString(1, jTextField2.getText());
+            pst.setInt(2, Integer.parseInt(jTextField3.getText()));
+            pst.setDouble(3, Double.parseDouble(jTextField4.getText()));
+            pst.setString(4, jTextField5.getText());
+            pst.setString(5, jTextField6.getText());
+            pst.execute();
+            ItemTable();
+            JOptionPane.showMessageDialog(null, "Item has been saved !");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "wrog enty " + e);
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField9ActionPerformed
+        try {
+            String qry = "delete from submenu where sub_id=?";
+            pst = conn.prepareStatement(qry);
+            pst.setInt(1, (Integer.parseInt(jTextField8.getText())));
+            //  pst.setString(2, jTextField7.getText());
+            pst.executeUpdate();
+            MainMenuTable();
 
-    private void Res_tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Res_tblMouseClicked
+            JOptionPane.showMessageDialog(null, "Menu Item Deleted Successfuylly !");
+
+        } catch (Exception e) {
+
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        int row = Res_tbl.getSelectedRow();
-        TableModel model = Res_tbl.getModel();
-        jTextField9.setText(model.getValueAt(row, 0).toString());
-        jTextField10.setText(model.getValueAt(row, 1).toString());
-        jTextArea2.setText(model.getValueAt(row, 2).toString());
-        jTextField12.setText(model.getValueAt(row, 3).toString());
-        jTextArea1.setText(model.getValueAt(row, 4).toString());
+        String id = jTextField8.getText();
+        String category = jTextField7.getText();
+        String qry = "update submenu set menu_category='" + category + "' where sub_id='" + id + "'";
+        try {
+            pst = conn.prepareStatement(qry);
+            pst.executeUpdate();
+            MainMenuTable();
+            JOptionPane.showMessageDialog(null, "Item Updated !");
+        } catch (SQLException ex) {
+            Logger.getLogger(AdminPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        try {
+            String qry = "insert into submenu (menu_category) values(?)";
+            pst = conn.prepareStatement(qry);
+            // pst.setInt(1, (Integer.parseInt(jTextField8.getText())));
+            pst.setString(1, jTextField7.getText());
+            pst.execute();
+            MainMenuTable();
 
-    }//GEN-LAST:event_Res_tblMouseClicked
+            JOptionPane.showMessageDialog(null, "Menu Item Saved Successfuylly !");
+
+        } catch (Exception e) {
+
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void menu_tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menu_tblMouseClicked
+        // TODO add your handling code here:
+        int i = menu_tbl.getSelectedRow();
+        TableModel model = menu_tbl.getModel();
+        jTextField8.setText(model.getValueAt(i, 0).toString());
+        jTextField7.setText(model.getValueAt(i, 1).toString());
+    }//GEN-LAST:event_menu_tblMouseClicked
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void item_tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_item_tblMouseClicked
+        // TODO add your handling code here:
+        int i = item_tbl.getSelectedRow();
+        TableModel model = item_tbl.getModel();
+        jTextField1.setText(model.getValueAt(i, 0).toString());
+        jTextField2.setText(model.getValueAt(i, 1).toString());
+        jTextField3.setText(model.getValueAt(i, 2).toString());
+        jTextField4.setText(model.getValueAt(i, 3).toString());
+        jTextField5.setText(model.getValueAt(i, 4).toString());
+        jTextField6.setText(model.getValueAt(i, 5).toString());
+    }//GEN-LAST:event_item_tblMouseClicked
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         // TODO add your handling code here:
@@ -866,6 +1044,92 @@ public class AdminPage extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "" + e);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void Res_tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Res_tblMouseClicked
+        // TODO add your handling code here:
+        int row = Res_tbl.getSelectedRow();
+        TableModel model = Res_tbl.getModel();
+        jTextField9.setText(model.getValueAt(row, 0).toString());
+        jTextField10.setText(model.getValueAt(row, 1).toString());
+        jTextArea2.setText(model.getValueAt(row, 2).toString());
+        jTextField12.setText(model.getValueAt(row, 3).toString());
+        jTextArea1.setText(model.getValueAt(row, 4).toString());
+
+    }//GEN-LAST:event_Res_tblMouseClicked
+
+    private void jTextField9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField9ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField9ActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        // TODO add your handling code here: Line chart
+        try {
+            qry = "Select datetime,item_price,item_title from receipt ";
+//            pst=conn.prepareStatement(qry);
+//            res=pst.executeQuery();
+            //  DefaultCategoryDataset() dataset = new DefaultCategoryDataset(conn.ConnectDB(),qry);
+            JDBCCategoryDataset dataset = new JDBCCategoryDataset(ProConnection.ConnectDB(), qry);
+            JFreeChart chart = ChartFactory.createLineChart("Time", "Price", "Item Sold", dataset, PlotOrientation.VERTICAL, false, true, true);
+            BarRenderer renderer = null;
+            renderer = new BarRenderer();
+            ChartFrame frame = new ChartFrame("Line Chart", chart);
+            frame.setVisible(true);
+            frame.setSize(500, 650);
+
+        } catch (Exception e) {
+
+        }
+
+
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+//    public void Sale() {
+//
+//        try {
+//
+//   qry = "SELECT Round(sum(total),2) As TotalSum, COUNT(rec_id) As ReceiptID from Receipt where CAST(`DateTime` AS DATE) > (NOW() - INTERVAL 30 DAY)";
+//            pst = conn.prepareStatement(qry);
+//
+//            res = pst.executeQuery();
+//            if (res.next()) {
+//                jTextField15.setText(res.getString("TotalSum"));
+//                jTextField11.setText(res.getString("ReceiptID"));
+//            }
+//            //EmployeeIDField.setText(rs.getString("EmployeeID"));
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, "Sale " + e);
+//        }
+//    }
+    public void TotalSale() {
+        qry = "select count(distinct rec_id) as Number_Of_Items, payment_type, total as Total \n"
+                + " from Receipt\n"
+                + "where (upper(payment_type) like 'CASH%' or upper(payment_type) like 'CARD%')\n"
+                + "  and CAST(`DateTime` AS DATE) > (NOW() - INTERVAL 30 DAY)\n"
+                + "group by payment_type;";
+
+        try {
+            pst = conn.prepareStatement(qry);
+            res = pst.executeQuery();
+        //   pst.setInt(1,CustomerId);
+
+            DefaultTableModel tableModel = (DefaultTableModel) Sale_Table.getModel();
+            Sale_Table.setModel(DbUtils.resultSetToTableModel(res));
+
+            Object[] row;
+            while (res.next()) {
+                row = new Object[2];
+                row[0] = res.getString(0);
+                row[1] = res.getString(1);
+                row[2] = res.getString(2);
+                tableModel.addRow(row);
+
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Total sal" + e);
+        }
+
+    }
 
     /**
      * @param args the command line arguments
@@ -904,6 +1168,7 @@ public class AdminPage extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Res_tbl;
+    private javax.swing.JTable Sale_Table;
     private javax.swing.JTable item_tbl;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -925,6 +1190,12 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -937,6 +1208,8 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     public static javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -944,13 +1217,20 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     public static javax.swing.JTextArea jTextArea3;
+    private javax.swing.JTextArea jTextArea4;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
+    private javax.swing.JTextField jTextField11;
     private javax.swing.JTextField jTextField12;
+    private javax.swing.JTextField jTextField13;
+    private javax.swing.JTextField jTextField14;
+    private javax.swing.JTextField jTextField15;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
@@ -959,6 +1239,7 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
+    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTable menu_tbl;
     // End of variables declaration//GEN-END:variables
 }
