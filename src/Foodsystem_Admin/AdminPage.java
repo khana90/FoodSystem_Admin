@@ -3,8 +3,6 @@ package Foodsystem_Admin;
 import org.jfree.data.jdbc.JDBCCategoryDataset;
 import org.jfree.chart.JFreeChart;
 import Foodsystem_Admin.AdminPage;
-import Foodsystem_Admin.ProConnection;
-import com.sun.jmx.snmp.tasks.Task;
 import java.awt.HeadlessException;
 import java.awt.List;
 import java.sql.Connection;
@@ -23,9 +21,6 @@ import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
-import java.util.Timer;
-import java.util.TimerTask;
-import javax.swing.JFormattedTextField;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 
@@ -46,6 +41,7 @@ public class AdminPage extends javax.swing.JFrame {
     String qry;
 
     public static int CustomerId;
+  
 
     public AdminPage() {
         initComponents();
@@ -57,6 +53,7 @@ public class AdminPage extends javax.swing.JFrame {
         //  Sale();
         DateTime();
         TotalSale();
+      //  BarChart();
 
         this.setLocationRelativeTo(null);
 
@@ -82,28 +79,29 @@ public class AdminPage extends javax.swing.JFrame {
     public AdminPage(ListModel modl) {
         initComponents();
         jListAdmin.setModel(modl);
+        
     }
 
     public void LiveOrders() {
         java.util.TimerTask task = new java.util.TimerTask() {
-            //int cust_id = 0;
+            
+    private int executionTick = 0;
+    
             @Override
             public void run() {
 
                 try {
                     DefaultListModel model = new DefaultListModel();
                     String qry = "SELECT * from receipt where cust_id =(select Max(cust_id) from receipt)  \n"
-                            + "GROUP by item_title\n"
-                            + "ORDER BY cust_id";
+                            + "";
 
                     pst = conn.prepareStatement(qry);
-                //    pst.setInt(1, CustomerId);
+                    //    pst.setInt(1, CustomerId);
                     //   pst.setInt(2, Shopping_Basket.BasketId);
                     res = pst.executeQuery();
 
                     if (res.next()) {
                         model.addElement("<<<<<<<<<<<CUSTOMER Address>>>>>>>>>>>");
-                          
                         model.addElement("Customer Id: " + res.getInt("cust_id"));
                         model.addElement("Customer Name: " + res.getString("cust_name"));
                         model.addElement("Customer Email: " + res.getString("cust_email"));
@@ -114,10 +112,11 @@ public class AdminPage extends javax.swing.JFrame {
                         model.addElement("Payment Type: " + res.getString("payment_type"));
                         model.addElement("Date and Time: " + res.getString("DateTime"));
                         model.addElement("Total: " + res.getString("total"));
-                        model.addElement("Note :"+ res.getString("Order_Request"));
+                        model.addElement("Note :" + res.getString("Order_Request"));
                     }
                     jListAdmin.setModel(model);
 
+                    res = pst.executeQuery();
                     while (res.next()) {
                         model.addElement("*************CUSTOMER ORDER*************");
                         model.addElement("Item Name: " + res.getString("item_title"));
@@ -127,6 +126,7 @@ public class AdminPage extends javax.swing.JFrame {
                     }
                     model.addElement("**********Enjoy Your Meal **********");
                     jListAdmin.setModel(model);
+                //    JOptionPane.showMessageDialog(null, "New order had been received");
 
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "error with list fetchData" + e);
@@ -135,13 +135,10 @@ public class AdminPage extends javax.swing.JFrame {
 
             }
         };
+
         java.util.Timer timer = new java.util.Timer(true);// true to run timer as daemon thread
-        timer.schedule(task, 0, 9000);// Run task every 5 second    
-//        try {
-//            Thread.sleep(20000); // Cancel task after 1 minute.
-//        } catch (InterruptedException e) {
-//        }
-        // timer.cancel();
+        timer.schedule(task, 0, 9000);// Run task every 5 second
+
     }
 
     //end of life order class
@@ -195,6 +192,7 @@ public class AdminPage extends javax.swing.JFrame {
         jScrollPane7 = new javax.swing.JScrollPane();
         jTextArea3 = new javax.swing.JTextArea();
         jLabel19 = new javax.swing.JLabel();
+        jButton9 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
@@ -244,13 +242,9 @@ public class AdminPage extends javax.swing.JFrame {
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
-        jTextField11 = new javax.swing.JTextField();
         jLabel20 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
         jScrollPane9 = new javax.swing.JScrollPane();
         Sale_Table = new javax.swing.JTable();
-        jLabel25 = new javax.swing.JLabel();
-        jTextField15 = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jToggleButton1 = new javax.swing.JToggleButton();
         jScrollPane8 = new javax.swing.JScrollPane();
@@ -260,6 +254,7 @@ public class AdminPage extends javax.swing.JFrame {
         jTextField14 = new javax.swing.JTextField();
         jLabel22 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
+        jToggleButton2 = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -279,27 +274,32 @@ public class AdminPage extends javax.swing.JFrame {
 
         jTextArea3.setColumns(20);
         jTextArea3.setRows(5);
+        jTextArea3.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                jTextArea3MouseWheelMoved(evt);
+            }
+        });
         jScrollPane7.setViewportView(jTextArea3);
 
         jLabel19.setText("Note from Customer:");
+
+        jButton9.setText("Print");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 463, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(182, 182, 182))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(30, 30, 30))))
+                    .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton9))
+                .addGap(30, 30, 30))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -310,7 +310,10 @@ public class AdminPage extends javax.swing.JFrame {
                 .addComponent(jLabel19)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(139, 139, 139)
+                        .addComponent(jButton9))
                     .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 489, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(302, Short.MAX_VALUE))
         );
@@ -727,63 +730,38 @@ public class AdminPage extends javax.swing.JFrame {
         jLabel20.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         jLabel20.setText("Sales from the last 7 days ");
 
-        jLabel23.setText("Total Weekly Sale");
-
         Sale_Table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2"
+                "Title 1", "Title 2", "tatle 3"
             }
         ));
         jScrollPane9.setViewportView(Sale_Table);
-
-        jLabel25.setText("Total Number of orders");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(107, 107, 107)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addGap(107, 107, 107)
-                        .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(jPanel6Layout.createSequentialGroup()
-                                    .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)))))
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addGap(76, 76, 76)
-                        .addComponent(jLabel25)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(273, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(35, 35, 35)
+                .addGap(151, 151, 151)
                 .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(55, 55, 55)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel23)
-                    .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel25)
-                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(61, 61, 61)
-                .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(547, Short.MAX_VALUE))
+                .addGap(73, 73, 73)
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(571, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Sales", jPanel6);
@@ -815,6 +793,13 @@ public class AdminPage extends javax.swing.JFrame {
 
         jLabel24.setText("Time:");
 
+        jToggleButton2.setText("Bar Chart");
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -823,7 +808,9 @@ public class AdminPage extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
-                        .addComponent(jToggleButton1))
+                        .addComponent(jToggleButton1)
+                        .addGap(134, 134, 134)
+                        .addComponent(jToggleButton2))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 739, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -855,7 +842,9 @@ public class AdminPage extends javax.swing.JFrame {
                 .addGap(45, 45, 45)
                 .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(75, 75, 75)
-                .addComponent(jToggleButton1)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jToggleButton1)
+                    .addComponent(jToggleButton2))
                 .addContainerGap(538, Short.MAX_VALUE))
         );
 
@@ -919,7 +908,7 @@ public class AdminPage extends javax.swing.JFrame {
         String value6 = jTextField6.getText();
 
         try {
-            String qry = "Update itemmenu set description='" + value2 + "',sub_id='" + value3 + "',"
+            String qry = "Update itemmenu set description='"+value2 + "',sub_id='" + value3 + "',"
                     + "price='" + value4 + "', size='" + value5 + "', item_title='" + value6 + "'where item_id='" + value1 + "'";
             pst = conn.prepareStatement(qry);
             pst.executeUpdate();
@@ -1080,38 +1069,72 @@ public class AdminPage extends javax.swing.JFrame {
 
         }
 
-
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
-//    public void Sale() {
+    private void jTextArea3MouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_jTextArea3MouseWheelMoved
+        // TODO add your handling code here:
+        try {
+            qry = "select order_request from receipt where datatime = (select max(datetime) from receipt)";
+            pst = conn.prepareStatement(qry);
+            res = pst.executeQuery();
+            if (res.next()) {
+                String orde = res.getString("order_request");
+            }
+
+        } catch (Exception e) {
+
+    }//GEN-LAST:event_jTextArea3MouseWheelMoved
+    }
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        // Bar chart 
+         try {
+            qry = "Select datetime,sum(item_price), count(item_title) from receipt ";
+
+            JDBCCategoryDataset dataset = new JDBCCategoryDataset(ProConnection.ConnectDB(), qry);
+            JFreeChart chart = ChartFactory.createBarChart("", "Price Range", "Number Item Sold", dataset, PlotOrientation.VERTICAL, false, true, true);
+            BarRenderer renderer = null;
+            renderer = new BarRenderer();
+            ChartFrame frame = new ChartFrame("Bar Chart", chart);
+            frame.setVisible(true);
+            frame.setSize(600, 670);
+
+        } catch (Exception e) {
+
+        }
+        
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
+    
+    
+//    public void BarChart(){
+//        
+//         try {
+//            qry = "Select datetime,sum(item_price), count(item_title) from receipt ";
 //
-//        try {
+//            JDBCCategoryDataset dataset = new JDBCCategoryDataset(ProConnection.ConnectDB(), qry);
+//            JFreeChart chart = ChartFactory.createBarChart("", "Price Range", "Number Item Sold", dataset, PlotOrientation.VERTICAL, false, true, true);
+//            BarRenderer renderer = null;
+//            renderer = new BarRenderer();
+//            ChartFrame frame = new ChartFrame("Bar Chart", chart);
+//            frame.setVisible(true);
+//            frame.setSize(400, 450);
 //
-//   qry = "SELECT Round(sum(total),2) As TotalSum, COUNT(rec_id) As ReceiptID from Receipt where CAST(`DateTime` AS DATE) > (NOW() - INTERVAL 30 DAY)";
-//            pst = conn.prepareStatement(qry);
-//
-//            res = pst.executeQuery();
-//            if (res.next()) {
-//                jTextField15.setText(res.getString("TotalSum"));
-//                jTextField11.setText(res.getString("ReceiptID"));
-//            }
-//            //EmployeeIDField.setText(rs.getString("EmployeeID"));
 //        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "Sale " + e);
+//
 //        }
 //    }
+    
+
     public void TotalSale() {
-        qry = "select count(distinct rec_id) as Number_Of_Items, payment_type, total as Total \n"
+   qry = "select count(distinct rec_id) as Number_Of_Items, Payment_type, Total, sum(total) as GrandTotal \n"
                 + " from Receipt\n"
                 + "where (upper(payment_type) like 'CASH%' or upper(payment_type) like 'CARD%')\n"
-                + "  and CAST(`DateTime` AS DATE) > (NOW() - INTERVAL 30 DAY)\n"
+                + "and CAST(`DateTime` AS DATE) > (NOW() - INTERVAL 1 DAY)\n"
                 + "group by payment_type;";
 
         try {
             pst = conn.prepareStatement(qry);
             res = pst.executeQuery();
-        //   pst.setInt(1,CustomerId);
-
+            //   pst.setInt(1,CustomerId);l'\
             DefaultTableModel tableModel = (DefaultTableModel) Sale_Table.getModel();
             Sale_Table.setModel(DbUtils.resultSetToTableModel(res));
 
@@ -1121,6 +1144,7 @@ public class AdminPage extends javax.swing.JFrame {
                 row[0] = res.getString(0);
                 row[1] = res.getString(1);
                 row[2] = res.getString(2);
+                row[3]=res.getString(3);
                 tableModel.addRow(row);
 
             }
@@ -1178,6 +1202,7 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1193,9 +1218,7 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1226,11 +1249,9 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea4;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
-    private javax.swing.JTextField jTextField11;
     private javax.swing.JTextField jTextField12;
     private javax.swing.JTextField jTextField13;
     private javax.swing.JTextField jTextField14;
-    private javax.swing.JTextField jTextField15;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
@@ -1240,6 +1261,7 @@ public class AdminPage extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
     private javax.swing.JToggleButton jToggleButton1;
+    private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JTable menu_tbl;
     // End of variables declaration//GEN-END:variables
 }
